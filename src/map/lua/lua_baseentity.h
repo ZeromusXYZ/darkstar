@@ -377,7 +377,9 @@ public:
     int32 getSkillRank(lua_State*);         // Get your current skill craft Rank
     int32 setSkillRank(lua_State*);         // Set new skill craft rank
     int32 getCharSkillLevel(lua_State*);    // Get char skill level
-
+    int32 forceSkillUp(lua_State*);         // Used for skill books, forces a skillup
+    int32 isSkillCapped(lua_State*);        // Used for skill books to check if we can use it (checks for blue capped marked skill)
+    
     int32 addLearnedWeaponskill(lua_State*);
     int32 hasLearnedWeaponskill(lua_State*);
     int32 delLearnedWeaponskill(lua_State*);

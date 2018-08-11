@@ -62,6 +62,8 @@ namespace charutils
     void	AddExperiencePoints(bool expFromRaise, CCharEntity* PChar, CBaseEntity* PMob, uint32 exp, uint32 baseexp = 0, bool isexpchain = false);
 
     void	TrySkillUP(CCharEntity* PChar, SKILLTYPE SkillID, uint8 lvl);
+    void    ForceSkillUp(CCharEntity* PChar, SKILLTYPE SkillID);
+    bool    IsSkillCapped(CCharEntity* PChar, SKILLTYPE SkillID);
     void	BuildingCharSkillsTable(CCharEntity* PChar);
     void    BuildingCharWeaponSkills(CCharEntity* PChar);
     void	BuildingCharAbilityTable(CCharEntity* PChar);

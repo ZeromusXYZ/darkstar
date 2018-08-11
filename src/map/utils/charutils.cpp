@@ -2763,6 +2763,116 @@ namespace charutils
 
     /************************************************************************
     *                                                                       *
+    *  ForceSkillUp                                                         *
+    *  Added for skillup books itemid: 6147 -> 6179                         *
+    *                                                                       *
+    ************************************************************************/
+
+    void ForceSkillUp(CCharEntity* PChar, SKILLTYPE SkillID)
+    {
+        // Same as tryskillup but without random check, use for skill books
+
+        // This usually happens after a crash
+        DSP_DEBUG_BREAK_IF(SkillID >= MAX_SKILLTYPE);   // выход за пределы допустимых умений
+
+                                                        // only try if skill mentioned, and not marked as capped
+        if ((PChar->WorkingSkills.rank[SkillID] != 0) && !(PChar->WorkingSkills.skill[SkillID] & 0x8000))
+        {
+
+            uint16 CurSkill = PChar->RealSkills.skill[SkillID];
+            uint16 MaxSkill = battleutils::GetMaxSkill(SkillID, PChar->GetMJob(), PChar->GetMLevel());
+            MaxSkill = MaxSkill * 10;
+
+            double chance = 0;
+            double random = 0.;
+            uint8  SkillAmount = 1; // minimum skillup of 0.1
+            uint8  tier = 5;
+
+            // add a random amount using tiers, chance is lower as the amount get higher
+            for (uint8 i = 0; i < 4; ++i) // 1 + 4 возможных дополнительных (максимум 5)
+            {
+                random = dsprand::GetRandomNumber(1.);
+
+                switch (tier)
+                {
+                case 5:  chance = 0.900; break;
+                case 4:  chance = 0.700; break;
+                case 3:  chance = 0.500; break;
+                case 2:  chance = 0.300; break;
+                case 1:  chance = 0.200; break;
+                default: chance = 0.000; break;
+                }
+
+                if (chance < random || SkillAmount == 5) break;
+
+                tier -= 1;
+                SkillAmount += 1;
+            }
+
+            // Do skill amount multiplier (Will only be applied if default setting is changed)
+            if (map_config.skillup_amount_multiplier > 1)
+            {
+                SkillAmount += (uint8)(SkillAmount * map_config.skillup_amount_multiplier);
+                if (SkillAmount > 9)
+                {
+                    // skillups cap at 0.9
+                    SkillAmount = 9;
+                }
+            }
+
+            if (SkillAmount + CurSkill >= MaxSkill)
+            {
+                // Don't go over the cap
+                SkillAmount = MaxSkill - CurSkill;
+                PChar->WorkingSkills.skill[SkillID] |= 0x8000;
+            }
+
+            // apply skill level
+            PChar->RealSkills.skill[SkillID] += SkillAmount;
+            PChar->pushPacket(new CMessageBasicPacket(PChar, PChar, SkillID, SkillAmount, 38));
+
+            if ((CurSkill / 10) < (CurSkill + SkillAmount) / 10) // if gone up a level
+            {
+                PChar->WorkingSkills.skill[SkillID] += 1;
+                PChar->pushPacket(new CCharSkillsPacket(PChar));
+                PChar->pushPacket(new CMessageBasicPacket(PChar, PChar, SkillID, (CurSkill + SkillAmount) / 10, 53));
+
+                CheckWeaponSkill(PChar, SkillID);
+                /* ignoring this for now
+                if (SkillID >= 1 && SkillID <= 12)
+                {
+                PChar->addModifier(Mod::ATT, 1);
+                PChar->addModifier(Mod::ACC, 1);
+                }
+                */
+            }
+            SaveCharSkills(PChar, SkillID);
+
+        }
+    }
+
+    /************************************************************************
+    *                                                                       *
+    *  isSkillCapped                                                        *
+    *  Added for skillup books itemid: 6147 -> 6179                         *
+    *                                                                       *
+    ************************************************************************/
+
+    bool IsSkillCapped(CCharEntity* PChar, SKILLTYPE SkillID)
+    {
+        DSP_DEBUG_BREAK_IF(SkillID >= MAX_SKILLTYPE);
+
+        // only try if skill mentioned, and not marked as capped
+        if ((PChar->WorkingSkills.rank[SkillID] != 0) && (PChar->WorkingSkills.skill[SkillID] & 0x8000))
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    /************************************************************************
+    *                                                                       *
     *  When skill level gained check for weapon skill                       *
     *                                                                       *
     ************************************************************************/

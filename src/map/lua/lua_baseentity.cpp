@@ -7640,6 +7640,73 @@ inline int32 CLuaBaseEntity::getCharSkillLevel(lua_State *L)
     return 1;
 }
 
+
+/************************************************************************
+*  Function: forceSkillUp()
+*  Purpose : forces a Skillup for said skill
+*  Example : player:forceSkillUp(dsp.skill.SWORD)
+*  Notes   : Used for skill books
+************************************************************************/
+
+inline int32 CLuaBaseEntity::forceSkillUp(lua_State *L)
+{
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity == nullptr);
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity->objtype != TYPE_PC);
+
+    DSP_DEBUG_BREAK_IF(lua_isnil(L, 1) || !lua_isnumber(L, 1));
+
+    if (m_PBaseEntity->objtype != TYPE_PC)
+    {
+        lua_pushinteger(L, 0);
+    }
+    else
+    {
+        CCharEntity* PChar = (CCharEntity*)m_PBaseEntity;
+        SKILLTYPE skillID = (SKILLTYPE)lua_tointeger(L, 1);
+
+        charutils::ForceSkillUp(PChar, skillID);
+        lua_pushinteger(L, 1);
+    }
+
+    return 1;
+}
+
+/************************************************************************
+*  Function: isSkillCapped()
+*  Purpose : Checks if a skill is marked as capped
+*  Example : player:isSkillCapped(dsp.skill.SWORD)
+*  Notes   : Used for skill books
+************************************************************************/
+
+inline int32 CLuaBaseEntity::isSkillCapped(lua_State *L)
+{
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity == nullptr);
+    DSP_DEBUG_BREAK_IF(m_PBaseEntity->objtype != TYPE_PC);
+
+    DSP_DEBUG_BREAK_IF(lua_isnil(L, 1) || !lua_isnumber(L, 1));
+
+    if (m_PBaseEntity->objtype != TYPE_PC)
+    {
+        lua_pushinteger(L, 1);
+    }
+    else
+    {
+        CCharEntity* PChar = (CCharEntity*)m_PBaseEntity;
+        SKILLTYPE skillID = (SKILLTYPE)lua_tointeger(L, 1);
+
+        if (charutils::IsSkillCapped(PChar, skillID))
+        {
+            lua_pushinteger(L, 1);
+        }
+        else {
+            lua_pushinteger(L, 0);
+        }
+    }
+
+    return 1;
+}
+
+
 /************************************************************************
 *  Function: addLearnedWeaponskill()
 *  Purpose : Manually add a new weaponskill for the player using WSID
@@ -14101,6 +14168,8 @@ Lunar<CLuaBaseEntity>::Register_t CLuaBaseEntity::methods[] =
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,getSkillRank),
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,setSkillRank),
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,getCharSkillLevel),
+    LUNAR_DECLARE_METHOD(CLuaBaseEntity,forceSkillUp),
+    LUNAR_DECLARE_METHOD(CLuaBaseEntity,isSkillCapped),
 
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,addLearnedWeaponskill),
     LUNAR_DECLARE_METHOD(CLuaBaseEntity,hasLearnedWeaponskill),
