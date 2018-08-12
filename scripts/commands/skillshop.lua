@@ -15,10 +15,8 @@ cmdprops =
 
 function onTrigger(player,page)
 
-    local bookprice
+    local bookprice = 5000
     local showpage
-
-    bookprice = 5000
 
     if (page == nil) then
         showpage = 0
@@ -34,7 +32,7 @@ function onTrigger(player,page)
 
     if ((showpage <= 0) or (showpage > 2)) then
         player:PrintToPlayer( "Usage: !skillshop <page>", 0xF)
-        player:PrintToPlayer( "<page> can be combat or magic or 1 or 2", 0xF)
+        player:PrintToPlayer( "<page> can be combat, magic, 1 or 2", 0xF)
     end
 
     -- capture invalid pages
@@ -63,7 +61,7 @@ function onTrigger(player,page)
             6165,  bookprice,   -- Copy of Kagetora's journal
          }
         -- Show the current shop stock to the player
-        showShop(player,STATIC,stock)
+        dsp.shop.general(player, stock)
         player:PrintToPlayer( "Welcome to the Combat Skill Shop, Kupo!", 0xF)
     end
 
@@ -85,7 +83,7 @@ function onTrigger(player,page)
             -- 6179,  bookprice,   -- Copy of The Bell Tolls (do we actually already have handbell skill in this code ?)
          }
         -- Show the current shop stock to the player
-        showShop(player,STATIC,stock)
+        dsp.shop.general(player, stock)
         player:PrintToPlayer( "Welcome to the Magic Skill Shop, Kupo!", 0xF)
     end
 
