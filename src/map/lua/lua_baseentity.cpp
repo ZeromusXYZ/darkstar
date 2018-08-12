@@ -7687,20 +7687,14 @@ inline int32 CLuaBaseEntity::isSkillCapped(lua_State *L)
 
     if (m_PBaseEntity->objtype != TYPE_PC)
     {
-        lua_pushinteger(L, 1);
+        lua_pushboolean(L, true); // Report as capped if it's not a Player
     }
     else
     {
         CCharEntity* PChar = (CCharEntity*)m_PBaseEntity;
         SKILLTYPE skillID = (SKILLTYPE)lua_tointeger(L, 1);
 
-        if (charutils::IsSkillCapped(PChar, skillID))
-        {
-            lua_pushinteger(L, 1);
-        }
-        else {
-            lua_pushinteger(L, 0);
-        }
+        lua_pushboolean(L, charutils::IsSkillCapped(PChar, skillID));
     }
 
     return 1;

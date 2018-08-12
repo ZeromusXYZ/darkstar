@@ -2780,7 +2780,10 @@ namespace charutils
         {
 
             uint16 CurSkill = PChar->RealSkills.skill[SkillID];
-            uint16 MaxSkill = battleutils::GetMaxSkill(SkillID, PChar->GetMJob(), PChar->GetMLevel());
+            uint16 MaxSkillMain = battleutils::GetMaxSkill(SkillID, PChar->GetMJob(), PChar->GetMLevel());
+            uint16 MaxSkillSub = battleutils::GetMaxSkill(SkillID, PChar->GetSJob(), PChar->GetSLevel());
+            uint16 MaxSkill = MaxSkillMain;
+            if (MaxSkillSub > MaxSkillMain) MaxSkill = MaxSkillSub;
             MaxSkill = MaxSkill * 10;
 
             double chance = 0;
@@ -2862,12 +2865,14 @@ namespace charutils
     {
         DSP_DEBUG_BREAK_IF(SkillID >= MAX_SKILLTYPE);
 
-        // only try if skill mentioned, and not marked as capped
-        if ((PChar->WorkingSkills.rank[SkillID] != 0) && (PChar->WorkingSkills.skill[SkillID] & 0x8000))
-        {
-            return true;
-        }
-        return false;
+        uint16 CurSkill = PChar->RealSkills.skill[SkillID];
+        uint16 MaxSkillMain = battleutils::GetMaxSkill(SkillID, PChar->GetMJob(), PChar->GetMLevel());
+        uint16 MaxSkillSub = battleutils::GetMaxSkill(SkillID, PChar->GetSJob(), PChar->GetSLevel());
+        uint16 MaxSkill = MaxSkillMain;
+        if (MaxSkillSub > MaxSkillMain) MaxSkill = MaxSkillSub;
+        MaxSkill *= 10;
+
+        return (CurSkill >= MaxSkill);
     }
 
 

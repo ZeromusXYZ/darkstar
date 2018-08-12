@@ -8,7 +8,7 @@ require("scripts/globals/msg");
 require("scripts/globals/status");
 
 function onItemCheck(target)
-    if (target:isSkillCapped(dsp.skill.SINGING) == 1) then
+    if target:isSkillCapped(dsp.skill.SINGING) then
         return dsp.msg.basic.ITEM_UNABLE_TO_USE
     end
     return 0
